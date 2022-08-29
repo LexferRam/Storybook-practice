@@ -1,24 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
+import {useEffect, useState} from 'react';
+import { useDispatch, useStore } from './Context/DataContext';
 import './App.css';
+import Button from './components/Button/Button';
+import axios from 'axios';
+import Users from './components/Users/Users';
+
+export interface IUser{
+  id: number,
+  name: string,
+  username: string,
+}
 
 function App() {
+
+  const [users, setUsers] = useState<IUser[]>([]);
+
+  const { count } = useStore()
+  const dispatch = useDispatch()
+
+  useEffect(() =>{
+    const getUsers = async ()=> {
+      const {data} = await axios.get<IUser[]>("https://jsonplaceholder.typicode.com/users")
+      setUsers(data)
+    }
+    getUsers()
+  },[])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+      <p data-testid="counter">{count}</p>
+
+      <Button
+        action={() => dispatch({ type: "INCREASE" })}
+        label="Increment"
+        testId={1}
+      />
+
+      <Button
+        action={() => dispatch({ type: "DECREASE" })}
+        label="Decrement"
+        testId={2}
+      />
+
+      <Button
+        action={() => dispatch({ type: "RESET" })}
+        label="Reset"
+        testId={3}
+      />
+
+      <Users users={users}/>
+
     </div>
   );
 }
